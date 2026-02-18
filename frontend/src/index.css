@@ -1,0 +1,65 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Color Theme - Modern & Professional */
+:root {
+  --primary: #6366f1;
+  --primary-dark: #4f46e5;
+  --primary-light: #818cf8;
+  --secondary: #ec4899;
+  --accent: #f59e0b;
+  --background: #f8fafc;
+  --surface: #ffffff;
+  --text-primary: #1e293b;
+  --text-secondary: #64748b;
+  --border: #e2e8f0;
+  --success: #10b981;
+  --error: #ef4444;
+  --warning: #f59e0b;
+}
+
+* {
+  @apply transition-colors duration-200;
+}
+
+html, body {
+  @apply bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 min-h-screen;
+  color: var(--text-primary);
+  font-family: 'Segoe UI', 'Roboto', sans-serif;
+}
+
+/* Typography */
+@layer base {
+  h1 {
+    @apply text-4xl font-bold tracking-tight text-gray-900;
+  }
+  h2 {
+    @apply text-3xl font-bold tracking-tight text-gray-900;
+  }
+  h3 {
+    @apply text-xl font-semibold text-gray-900;
+  }
+  
+  p {
+    @apply text-gray-600 leading-relaxed;
+  }
+}
+
+/* Scrollbar estilizado */
+::-webkit-scrollbar {
+  @apply w-2;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-gray-100;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-gradient-to-b from-indigo-400 to-indigo-600 rounded-full hover:from-indigo-500 hover:to-indigo-700;
+}
+
+/* Selection */
+::selection {
+  @apply bg-indigo-200 text-indigo-900;
+}
