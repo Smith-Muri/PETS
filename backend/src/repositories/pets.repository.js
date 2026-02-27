@@ -10,10 +10,24 @@ class PetsRepository {
    * Crear mascota
    */
   async create(id, ownerId, name, funFacts, image = null) {
-    await run(
-      'INSERT INTO pets (id, ownerId, name, funFacts, image) VALUES (?, ?, ?, ?, ?)',
-      [id, ownerId, name, funFacts, image]
-    );
+    if (typeof image === 'undefined') image = null;
+    // If enabled is provided as 1/0/true/false, handle it; otherwise rely on DB default
+    // Backwards-compatible signature: create(id, ownerId, name, funFacts, image, enabled)
+    const args = Array.from(arguments);
+    const providedEnabled = args.length >= 6 ? args[5] : undefined;
+
+    if (providedEnabled === undefined) {
+      await run(
+        'INSERT INTO pets (id, ownerId, name, funFacts, image) VALUES (?, ?, ?, ?, ?)',
+        [id, ownerId, name, funFacts, image]
+      );
+    } else {
+      const enabledValue = (providedEnabled === '1' || providedEnabled === 1 || providedEnabled === true) ? 1 : 0;
+      await run(
+        'INSERT INTO pets (id, ownerId, name, funFacts, image, enabled) VALUES (?, ?, ?, ?, ?, ?)',
+        [id, ownerId, name, funFacts, image, enabledValue]
+      );
+    }
     return this.getById(id);
   }
 
@@ -22,11 +36,16 @@ class PetsRepository {
    */
   async getById(id) {
     return get(
-      `SELECT p.*, COUNT(l.id) as likeCount
+      `SELECT p.*, 
+         COALESCE(lc.count, 0) + COALESCE(ac.count, 0) as likeCount
        FROM pets p
-       LEFT JOIN likes l ON p.id = l.petId
-       WHERE p.id = ?
-       GROUP BY p.id`,
+       LEFT JOIN (
+         SELECT petId, COUNT(*) as count FROM likes GROUP BY petId
+       ) lc ON p.id = lc.petId
+       LEFT JOIN (
+         SELECT petId, COUNT(*) as count FROM anon_likes GROUP BY petId
+       ) ac ON p.id = ac.petId
+       WHERE p.id = ?`,
       [id]
     );
   }
@@ -36,11 +55,15 @@ class PetsRepository {
    */
   async getPublic(limit = 12, offset = 0) {
     return all(
-      `SELECT p.*, COUNT(l.id) as likeCount
+      `SELECT p.*, COALESCE(lc.count, 0) + COALESCE(ac.count, 0) as likeCount
        FROM pets p
-       LEFT JOIN likes l ON p.id = l.petId
+       LEFT JOIN (
+         SELECT petId, COUNT(*) as count FROM likes GROUP BY petId
+       ) lc ON p.id = lc.petId
+       LEFT JOIN (
+         SELECT petId, COUNT(*) as count FROM anon_likes GROUP BY petId
+       ) ac ON p.id = ac.petId
        WHERE p.enabled = 1
-       GROUP BY p.id
        ORDER BY p.createdAt DESC
        LIMIT ? OFFSET ?`,
       [limit, offset]
@@ -60,11 +83,15 @@ class PetsRepository {
    */
   async getByOwnerId(ownerId) {
     return all(
-      `SELECT p.*, COUNT(l.id) as likeCount
+      `SELECT p.*, COALESCE(lc.count, 0) + COALESCE(ac.count, 0) as likeCount
        FROM pets p
-       LEFT JOIN likes l ON p.id = l.petId
+       LEFT JOIN (
+         SELECT petId, COUNT(*) as count FROM likes GROUP BY petId
+       ) lc ON p.id = lc.petId
+       LEFT JOIN (
+         SELECT petId, COUNT(*) as count FROM anon_likes GROUP BY petId
+       ) ac ON p.id = ac.petId
        WHERE p.ownerId = ?
-       GROUP BY p.id
        ORDER BY p.createdAt DESC`,
       [ownerId]
     );
@@ -75,11 +102,15 @@ class PetsRepository {
    */
   async searchPublic(searchTerm, limit = 12, offset = 0) {
     return all(
-      `SELECT p.*, COUNT(l.id) as likeCount
+      `SELECT p.*, COALESCE(lc.count, 0) + COALESCE(ac.count, 0) as likeCount
        FROM pets p
-       LEFT JOIN likes l ON p.id = l.petId
+       LEFT JOIN (
+         SELECT petId, COUNT(*) as count FROM likes GROUP BY petId
+       ) lc ON p.id = lc.petId
+       LEFT JOIN (
+         SELECT petId, COUNT(*) as count FROM anon_likes GROUP BY petId
+       ) ac ON p.id = ac.petId
        WHERE p.enabled = 1 AND LOWER(p.name) LIKE LOWER(?)
-       GROUP BY p.id
        ORDER BY p.createdAt DESC
        LIMIT ? OFFSET ?`,
       [`%${searchTerm}%`, limit, offset]

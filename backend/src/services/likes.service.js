@@ -1,6 +1,7 @@
 const crypto = require('crypto');
 const likesRepository = require('../repositories/likes.repository');
 const petsService = require('../services/pets.service');
+const anonLikesRepository = require('../repositories/anonLikes.repository');
 
 class LikesService {
 
@@ -11,7 +12,6 @@ class LikesService {
   async like(userId, petId) {
    
     await petsService.getById(petId);
-
     const exists = await likesRepository.exists(userId, petId);
     if (exists) {
       const err = new Error('Ya has likeado esta mascota');
@@ -21,6 +21,19 @@ class LikesService {
 
     const likeId = crypto.randomUUID();
     return likesRepository.create(likeId, userId, petId);
+  }
+
+  // Anonymous like: store in anon_likes
+  async likeAnon(anonId, petId) {
+    await petsService.getById(petId);
+    const exists = await anonLikesRepository.exists(anonId, petId);
+    if (exists) {
+      const err = new Error('Ya has likeado esta mascota (anónimo)');
+      err.statusCode = 409;
+      throw err;
+    }
+    const id = crypto.randomUUID();
+    return anonLikesRepository.create(id, anonId, petId);
   }
 
   async unlike(userId, petId) {
@@ -34,13 +47,32 @@ class LikesService {
     await likesRepository.deleteByUserAndPet(userId, petId);
   }
 
+  async unlikeAnon(anonId, petId) {
+    const exists = await anonLikesRepository.exists(anonId, petId);
+    if (!exists) {
+      const err = new Error('No has likeado esta mascota (anónimo)');
+      err.statusCode = 404;
+      throw err;
+    }
+    await anonLikesRepository.deleteByAnonAndPet(anonId, petId);
+  }
+
   async getLikedPetIds(userId) {
     const results = await likesRepository.getByUserId(userId);
     return results.map(r => r.petId);
   }
 
+  async getLikedPetIdsAnon(anonId) {
+    const results = await anonLikesRepository.getByAnonId(anonId);
+    return results.map(r => r.petId);
+  }
+
   async hasLiked(userId, petId) {
     return likesRepository.exists(userId, petId);
+  }
+
+  async hasLikedAnon(anonId, petId) {
+    return anonLikesRepository.exists(anonId, petId);
   }
 
   async getLikeCount(petId) {

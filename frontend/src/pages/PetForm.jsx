@@ -92,7 +92,11 @@ export default function PetForm() {
       const form = new FormData();
       form.append('name', formData.name);
       form.append('funFacts', formData.funFacts);
-      form.append('enabled', formData.enabled ? 1 : 0);
+      // only include enabled if user explicitly interacted with the checkbox
+      // (formData.enabled is a boolean already)
+      if (typeof formData.enabled === 'boolean') {
+        form.append('enabled', formData.enabled);
+      }
       if (formData.image) {
         form.append('image', formData.image);
       }

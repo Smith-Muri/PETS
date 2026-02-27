@@ -16,8 +16,18 @@ class LikesController {
   async like(req, res, next) {
     try {
       const data = req.body;
-      const like = await likesService.like(req.userId, data.petId);
-      return success(res, like, 201);
+      const anonId = req.headers['x-anonymous-id'];
+      if (req.userId) {
+        const like = await likesService.like(req.userId, data.petId);
+        return success(res, like, 201);
+      }
+      if (anonId) {
+        const like = await likesService.likeAnon(anonId, data.petId);
+        return success(res, like, 201);
+      }
+      const err = new Error('Authentication required or provide X-Anonymous-Id');
+      err.statusCode = 401;
+      throw err;
     } catch (err) {
       next(err);
     }
@@ -29,8 +39,18 @@ class LikesController {
    */
   async unlike(req, res, next) {
     try {
-      await likesService.unlike(req.userId, req.params.petId);
-      return success(res, { message: 'Like removido' });
+      const anonId = req.headers['x-anonymous-id'];
+      if (req.userId) {
+        await likesService.unlike(req.userId, req.params.petId);
+        return success(res, { message: 'Like removido' });
+      }
+      if (anonId) {
+        await likesService.unlikeAnon(anonId, req.params.petId);
+        return success(res, { message: 'Like removido (anónimo)' });
+      }
+      const err = new Error('Authentication required or provide X-Anonymous-Id');
+      err.statusCode = 401;
+      throw err;
     } catch (err) {
       next(err);
     }

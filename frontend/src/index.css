@@ -63,3 +63,12 @@ html, body {
 ::selection {
   @apply bg-indigo-200 text-indigo-900;
 }
+
+/* Utility: hide native scrollbar while keeping scroll behavior */
+.no-scrollbar {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}

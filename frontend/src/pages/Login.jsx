@@ -20,6 +20,18 @@ export default function Login() {
     e.preventDefault();
     setError('');
     setLoading(true);
+    // Basic client-side validation
+    const emailValid = /^\S+@\S+\.\S+$/.test(email);
+    if (!email || !password) {
+      setError('Por favor completa email y contraseña.');
+      setLoading(false);
+      return;
+    }
+    if (!emailValid) {
+      setError('Introduce un email válido.');
+      setLoading(false);
+      return;
+    }
 
     try {
       const response = await authAPI.login({ email, password });
@@ -67,6 +79,7 @@ export default function Login() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  aria-label="Email"
                   placeholder="tu@email.com"
                   required
                   className="bg-slate-50"
@@ -83,6 +96,7 @@ export default function Login() {
                     type={showPassword ? 'text' : 'password'}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                    aria-label="Contraseña"
                     placeholder="••••••••"
                     required
                     className="bg-slate-50 pr-10"
@@ -103,7 +117,7 @@ export default function Login() {
 
               {/* Error */}
               {error && (
-                <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm font-medium">
+                <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm font-medium" aria-live="polite">
                   {error}
                 </div>
               )}

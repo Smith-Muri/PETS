@@ -70,6 +70,19 @@ CREATE TABLE IF NOT EXISTS likes (
 
 CREATE INDEX IF NOT EXISTS idx_likes_userId ON likes(userId);
 CREATE INDEX IF NOT EXISTS idx_likes_petId ON likes(petId);
+
+-- Anonymous likes (for users without account). Stored separately to avoid FK constraints.
+CREATE TABLE IF NOT EXISTS anon_likes (
+  id TEXT PRIMARY KEY,
+  anonId TEXT NOT NULL,
+  petId TEXT NOT NULL,
+  createdAt INTEGER DEFAULT (strftime('%s', 'now')) NOT NULL,
+
+  UNIQUE(anonId, petId)
+);
+
+CREATE INDEX IF NOT EXISTS idx_anon_likes_anonId ON anon_likes(anonId);
+CREATE INDEX IF NOT EXISTS idx_anon_likes_petId ON anon_likes(petId);
 `;
 
 function initializeSchema() {

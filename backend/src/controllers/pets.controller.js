@@ -7,7 +7,9 @@ class PetsController {
     try {
       const data = req.body;
       const imageFile = req.file?.filename || null;
-      const pet = await petsService.create(req.userId, data.name, data.funFacts, imageFile);
+      // Persist explicit enabled flag when provided by frontend (1/0 or true/false)
+      const enabled = data.enabled !== undefined ? (data.enabled === '1' || data.enabled === 1 || data.enabled === true) : undefined;
+      const pet = await petsService.create(req.userId, data.name, data.funFacts, imageFile, enabled);
       return success(res, pet, 201);
     } catch (err) {
       next(err);
@@ -29,10 +31,20 @@ class PetsController {
           likedByMe: likedIds.includes(pet.id),
         }));
       } else {
-        result.data = result.data.map(pet => ({
-          ...pet,
-          likedByMe: false,
-        }));
+        // If anonymous id provided, check anon likes
+        const anonId = req.headers['x-anonymous-id'];
+        if (anonId) {
+          const anonLiked = await likesService.getLikedPetIdsAnon(anonId);
+          result.data = result.data.map(pet => ({
+            ...pet,
+            likedByMe: anonLiked.includes(pet.id),
+          }));
+        } else {
+          result.data = result.data.map(pet => ({
+            ...pet,
+            likedByMe: false,
+          }));
+        }
       }
 
       return success(res, result);
@@ -50,7 +62,12 @@ class PetsController {
       if (req.userId) {
         pet.likedByMe = await likesService.hasLiked(req.userId, pet.id);
       } else {
-        pet.likedByMe = false;
+        const anonId = req.headers['x-anonymous-id'];
+        if (anonId) {
+          pet.likedByMe = await likesService.hasLikedAnon(anonId, pet.id);
+        } else {
+          pet.likedByMe = false;
+        }
       }
 
       return success(res, pet);

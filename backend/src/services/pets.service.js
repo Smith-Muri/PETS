@@ -17,9 +17,10 @@ class PetsService {
     return pet;
   }
 
-  async create(ownerId, name, funFacts, image = null) {
+  async create(ownerId, name, funFacts, image = null, enabled = undefined) {
     const petId = crypto.randomUUID();
-    return petsRepository.create(petId, ownerId, name, funFacts, image);
+    // If enabled is undefined, repository will use DB default. Otherwise pass 1/0.
+    return petsRepository.create(petId, ownerId, name, funFacts, image, enabled);
   }
 
 

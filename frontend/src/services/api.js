@@ -76,8 +76,14 @@ export const authAPI = {
 
 
 export const petsAPI = {
-  listPublic: (page = 1, limit = 12, search = '') =>
-    api.get('/pets', { params: { page, limit, search } }),
+  listPublic: (page = 1, limit = 12, search = '') => {
+    const anonId = localStorage.getItem('anon_id');
+    const token = localStorage.getItem('auth_token');
+    const headers = {};
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+    else if (anonId) headers['X-Anonymous-Id'] = anonId;
+    return api.get('/pets', { params: { page, limit, search }, headers });
+  },
   getById: (id) => api.get(`/pets/${id}`),
   getMyPets: () => api.get('/pets/my/list'),
   create: (formData) => api.post('/pets', formData, {
@@ -92,8 +98,22 @@ export const petsAPI = {
 
 
 export const likesAPI = {
-  like: (petId) => api.post('/likes', { petId }),
-  unlike: (petId) => api.delete(`/likes/${petId}`),
+  like: (petId) => {
+    const token = localStorage.getItem('auth_token');
+    const anonId = localStorage.getItem('anon_id');
+    const headers = {};
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+    else if (anonId) headers['X-Anonymous-Id'] = anonId;
+    return api.post('/likes', { petId }, { headers });
+  },
+  unlike: (petId) => {
+    const token = localStorage.getItem('auth_token');
+    const anonId = localStorage.getItem('anon_id');
+    const headers = {};
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+    else if (anonId) headers['X-Anonymous-Id'] = anonId;
+    return api.delete(`/likes/${petId}`, { headers });
+  },
   getMyLikes: () => api.get('/likes/my-likes'),
 };
 

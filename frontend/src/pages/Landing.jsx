@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
 import PetCard from '../components/PetCard';
+import PublicCarousel from '../components/PublicCarousel';
 import Pagination from '../components/Pagination';
 import { Input } from '../components/ui/input';
 import { petsAPI, likesAPI } from '../services/api';
@@ -29,14 +30,19 @@ export default function Landing() {
         setError(null);
         setLoading(true);
         console.log('🐾 Fetching pets from:', debouncedSearch ? `search: ${debouncedSearch}` : 'all');
+        // Normalize search term to improve matching (remove diacritics)
+        const normalized = debouncedSearch
+          ? debouncedSearch.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+          : '';
         const response = await petsAPI.listPublic(
           currentPage,
           12,
-          debouncedSearch
+          normalized
         );
         console.log('✅ Pets loaded successfully:', response.data);
-        setPets(response.data.data);
-        setPagination(response.data.pagination);
+        const payload = response.data.data; // { data: [...], pagination: {...} }
+        setPets(payload.data || []);
+        setPagination(payload.pagination || { totalPages: 1, totalItems: 0 });
       } catch (error) {
         console.error('❌ Error loading pets:', error);
         setError(`No se pudo cargar las mascotas: ${error.message}`);
@@ -58,8 +64,12 @@ export default function Landing() {
         await likesAPI.like(petId);
       }
       // Recargar mascotas
-      const response = await petsAPI.listPublic(currentPage, 12, debouncedSearch);
-      setPets(response.data.data);
+      const normalized = debouncedSearch
+        ? debouncedSearch.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        : '';
+      const response = await petsAPI.listPublic(currentPage, 12, normalized);
+      const payload = response.data.data;
+      setPets(payload.data || []);
     } catch (error) {
       console.error('Error toggling like:', error);
     }
@@ -99,6 +109,11 @@ export default function Landing() {
                 className="pl-12 bg-white shadow-lg hover:shadow-xl"
               />
             </div>
+          </div>
+
+          {/* Public carousel */}
+          <div className="mb-12">
+            <PublicCarousel onLike={handleLike} />
           </div>
 
           {/* Loading State */}
