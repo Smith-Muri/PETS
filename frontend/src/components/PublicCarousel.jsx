@@ -120,7 +120,13 @@ export default function PublicCarousel({ onLike }) {
                 <Button
                   variant={pet.likedByMe ? 'default' : 'outline'}
                   size="sm"
-                  onClick={() => onLike?.(pet.id, pet.likedByMe)}
+                  onClick={() => {
+                    if (isAuthenticated && !pet.likedByMe) {
+                      setItems((prev) => prev.map((p) => p.id === pet.id ? { ...p, likedByMe: true, likeCount: (p.likeCount || 0) + 1 } : p));
+                    }
+                    onLike?.(pet.id, pet.likedByMe);
+                  }}
+                  disabled={isAuthenticated && pet.likedByMe}
                 >
                   <Heart size={14} className={pet.likedByMe ? 'fill-white' : ''} />
                 </Button>
@@ -188,15 +194,22 @@ export default function PublicCarousel({ onLike }) {
                             size="sm"
                             onClick={() => {
                               if (!isAuthenticated) {
-                                // create anon id if missing
                                 let anon = localStorage.getItem('anon_id');
                                 if (!anon) {
                                   anon = (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : `anon-${Date.now()}-${Math.floor(Math.random()*10000)}`;
                                   localStorage.setItem('anon_id', anon);
                                 }
+                                onLike?.(pet.id, pet.likedByMe);
+                                return;
+                              }
+
+                              // If authenticated: optimistic update for this carousel
+                              if (isAuthenticated && !pet.likedByMe) {
+                                setItems((prev) => prev.map((p) => p.id === pet.id ? { ...p, likedByMe: true, likeCount: (p.likeCount || 0) + 1 } : p));
                               }
                               onLike?.(pet.id, pet.likedByMe);
                             }}
+                            disabled={isAuthenticated && pet.likedByMe}
                           >
                             <Heart size={14} className={pet.likedByMe ? 'fill-white' : ''} />
                           </Button>

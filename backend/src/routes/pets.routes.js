@@ -6,6 +6,7 @@ const petsController = require('../controllers/pets.controller');
 const { validateBody } = require('../middleware/validate.middleware');
 const { createPetSchema, updatePetSchema } = require('../schemas/auth.schema');
 const authMiddleware = require('../middleware/auth.middleware');
+const optionalAuth = require('../middleware/optionalAuth.middleware');
 
 const router = express.Router();
 
@@ -32,11 +33,13 @@ const upload = multer({
 });
 
 // Public routes
-router.get('/', petsController.listPublic.bind(petsController));
-router.get('/:id', petsController.getById.bind(petsController));
+router.get('/', optionalAuth, petsController.listPublic.bind(petsController));
 
 // Private routes (require auth)
 router.get('/my/list', authMiddleware, petsController.listMine.bind(petsController));
+
+// Public routes (específicas)
+router.get('/:id', petsController.getById.bind(petsController));
 router.post('/', authMiddleware, upload.single('image'), validateBody(createPetSchema), petsController.create.bind(petsController));
 router.put('/:id', authMiddleware, upload.single('image'), validateBody(updatePetSchema), petsController.update.bind(petsController));
 router.delete('/:id', authMiddleware, petsController.delete.bind(petsController));

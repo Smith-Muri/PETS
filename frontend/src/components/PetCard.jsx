@@ -1,7 +1,7 @@
 import { Heart, Edit, Trash2, Lock } from 'lucide-react';
 import { Button } from './ui/button';
 import { Card, CardContent, CardFooter } from './ui/card';
-import Badge from './ui/badge';
+import { Badge } from './ui/badge';
 import { useAuth } from '../hooks/useAuth';
 import { getImageUrl } from '../config/env';
 import { useNavigate } from 'react-router-dom';
@@ -34,9 +34,13 @@ export default function PetCard({ pet, onLike, onEdit, onDelete, isMyPet = false
 
         {/* Public / Private Badge */}
         <div className="absolute top-3 left-3">
-          <Badge variant={pet.enabled ? 'success' : 'muted'}>
+          <div className={`px-3 py-1 rounded-full text-xs font-semibold ${
+            pet.enabled 
+              ? 'bg-emerald-100 text-emerald-700' 
+              : 'bg-slate-200 text-slate-600'
+          }`}>
             {pet.enabled ? 'Pública' : 'Privada'}
-          </Badge>
+          </div>
         </div>
 
         {/* Owner private indicator */}
@@ -74,14 +78,19 @@ export default function PetCard({ pet, onLike, onEdit, onDelete, isMyPet = false
               <Trash2 size={14} /> Eliminar
             </Button>
           </div>
+        ) : pet.likedByMe ? (
+          <div className="w-full flex items-center justify-center gap-2 py-2 bg-gradient-to-r from-indigo-50 to-blue-50 rounded-lg border border-indigo-200">
+            <Heart size={16} className="fill-indigo-600 text-indigo-600" />
+            <span className="font-semibold text-indigo-600">¡Te encanta!</span>
+          </div>
         ) : (
           <Button
             className="w-full gap-2"
-            variant={pet.likedByMe ? 'default' : 'outline'}
+            variant="outline"
             onClick={handleLikeClick}
           >
-            <Heart size={16} className={pet.likedByMe ? 'fill-white' : ''} />
-            {pet.likedByMe ? 'Likeado' : 'Dar Like'}
+            <Heart size={16} />
+            Dar Like
           </Button>
         )}
       </CardFooter>

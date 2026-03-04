@@ -3,7 +3,9 @@ import { useNavigate, useParams } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '../components/ui/card';
 import { Input } from '../components/ui/input';
+import { Textarea } from '../components/ui/textarea';
 import { Button } from '../components/ui/button';
+import { Label } from '../components/ui/label';
 import { petsAPI } from '../services/api';
 import { getImageUrl } from '../config/env';
 import { Upload, Eye } from 'lucide-react';
@@ -142,9 +144,9 @@ export default function PetForm() {
 
               {/* Imagen Upload */}
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-3">
+                <Label className="block text-sm font-semibold text-slate-700 mb-3">
                   Foto de tu Mascota
-                </label>
+                </Label>
                 <div className="relative">
                   <input
                     type="file"
@@ -186,10 +188,11 @@ export default function PetForm() {
 
               {/* Nombre */}
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">
+                <Label htmlFor="name" className="text-sm font-semibold text-slate-700 mb-2 block">
                   Nombre de la Mascota
-                </label>
+                </Label>
                 <Input
+                  id="name"
                   type="text"
                   name="name"
                   value={formData.name}
@@ -202,17 +205,18 @@ export default function PetForm() {
 
               {/* Fun Facts */}
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">
+                <Label htmlFor="funFacts" className="block text-sm font-semibold text-slate-700 mb-2">
                   Datos Curiosos
-                </label>
-                <textarea
+                </Label>
+                <Textarea
+                  id="funFacts"
                   name="funFacts"
                   value={formData.funFacts}
                   onChange={handleChange}
                   placeholder="Cuenta algo especial sobre tu mascota... ¿Cuál es su raza? ¿Cuántos años tiene? ¿Cuál es su truco favorito?"
-                  rows="4"
                   required
-                  className="w-full px-4 py-3 border-2 border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:border-transparent resize-none bg-slate-50 placeholder-slate-400"
+                  className="bg-slate-50"
+                  rows={4}
                 />
               </div>
 
@@ -226,7 +230,7 @@ export default function PetForm() {
                   onChange={handleChange}
                   className="w-5 h-5 rounded border-2 border-indigo-300 text-indigo-600 cursor-pointer"
                 />
-                <label htmlFor="enabled" className="flex-1 cursor-pointer">
+                <Label htmlFor="enabled" className="flex-1 cursor-pointer">
                   <div className="flex items-center gap-2 font-semibold text-slate-700">
                     <Eye size={18} className="text-indigo-600" />
                     Mostrar en catálogo público
@@ -234,7 +238,7 @@ export default function PetForm() {
                   <p className="text-sm text-slate-600 mt-1">
                     Otros usuarios podrán ver y dar like a tu mascota
                   </p>
-                </label>
+                </Label>
               </div>
             </form>
           </CardContent>

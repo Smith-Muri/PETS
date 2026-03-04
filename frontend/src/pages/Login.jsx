@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
+import { Label } from '../components/ui/label';
 import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/card';
 import { useAuth } from '../hooks/useAuth';
 import { Eye, EyeOff } from 'lucide-react';
@@ -72,15 +73,14 @@ export default function Login() {
             <form onSubmit={handleLogin} className="space-y-6">
               {/* Email */}
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">
+                <Label htmlFor="email" className="text-sm font-semibold text-slate-700 mb-2 block">
                   Email
-                </label>
+                </Label>
                 <Input
+                  id="email"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  aria-label="Email"
-                  placeholder="tu@email.com"
                   required
                   className="bg-slate-50"
                 />
@@ -88,15 +88,15 @@ export default function Login() {
 
               {/* Password */}
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">
+                <Label htmlFor="password" className="text-sm font-semibold text-slate-700 mb-2 block">
                   Contraseña
-                </label>
+                </Label>
                 <div className="relative">
                   <Input
+                    id="password"
                     type={showPassword ? 'text' : 'password'}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    aria-label="Contraseña"
                     placeholder="••••••••"
                     required
                     className="bg-slate-50 pr-10"
@@ -156,11 +156,6 @@ export default function Login() {
             </form>
           </CardContent>
         </Card>
-
-        {/* Footer */}
-        <p className="text-center text-xs text-slate-500 mt-6">
-          © 2024 PetsHub. Todos los derechos reservados.
-        </p>
       </div>
     </div>
   );

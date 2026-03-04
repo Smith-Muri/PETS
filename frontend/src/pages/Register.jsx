@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
+import { Label } from '../components/ui/label';
 import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/card';
 import { useAuth } from '../hooks/useAuth';
 import { Eye, EyeOff, Check } from 'lucide-react';
@@ -75,14 +76,15 @@ export default function Register() {
             <form onSubmit={handleRegister} className="space-y-6">
               {/* Nombre */}
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">
+                <Label htmlFor="name" className="text-sm font-semibold text-slate-700 mb-2 block">
                   Nombre Completo
-                </label>
+                </Label>
                 <Input
+                  id="name"
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="Juan Pérez"
+                  placeholder="Nombre completo"
                   required
                   className="bg-slate-50"
                 />
@@ -90,14 +92,15 @@ export default function Register() {
 
               {/* Email */}
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">
+                <Label htmlFor="email" className="text-sm font-semibold text-slate-700 mb-2 block">
                   Email
-                </label>
+                </Label>
                 <Input
+                  id="email"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="tu@email.com"
+                  placeholder='tu@gmail.com'
                   required
                   className="bg-slate-50"
                 />
@@ -110,6 +113,7 @@ export default function Register() {
                 </label>
                 <div className="relative">
                   <Input
+                    id="password"
                     type={showPassword ? 'text' : 'password'}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
@@ -192,11 +196,6 @@ export default function Register() {
             </form>
           </CardContent>
         </Card>
-
-        {/* Footer */}
-        <p className="text-center text-xs text-slate-500 mt-6">
-          © 2024 PetsHub. Todos los derechos reservados.
-        </p>
       </div>
     </div>
   );
