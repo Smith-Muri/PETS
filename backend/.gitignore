@@ -13,17 +13,13 @@ debug.log
 *.sqlite
 
 # uploads and generated
-uploads/
+uploads/*
 !uploads/.gitkeep
 coverage/
 
 # build output
 dist/
 build/
-
-# uploads & generated
-uploads/
-coverage/
 
 # system files
 .DS_Store
