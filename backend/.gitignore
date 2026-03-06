@@ -3,18 +3,18 @@ node_modules/
 
 # environment
 .env
-.env.*
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 debug.log
 
-# database files (do not commit actual data)
+# database files 
 *.db
 *.sqlite
 
 # uploads and generated
 uploads/
+!uploads/.gitkeep
 coverage/
 
 # build output
