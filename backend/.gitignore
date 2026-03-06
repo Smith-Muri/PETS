@@ -9,6 +9,14 @@ yarn-debug.log*
 yarn-error.log*
 debug.log
 
+# database files (do not commit actual data)
+*.db
+*.sqlite
+
+# uploads and generated
+uploads/
+coverage/
+
 # build output
 dist/
 build/

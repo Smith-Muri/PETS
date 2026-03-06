@@ -29,7 +29,10 @@ try {
 
 // ===== MIDDLEWARE GLOBAL =====
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:5175'],
+  // allow the frontend host defined in env (can be a comma-separated list if needed)
+  origin: process.env.CORS_ORIGIN
+    ? process.env.CORS_ORIGIN.split(',')
+    : [config.FRONTEND_URL],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Anonymous-Id'],
@@ -77,7 +80,8 @@ app.use((req, res) => {
 ║   🐶 PetsHub API Server                ║
 ║   Environment: ${config.NODE_ENV.padEnd(15)} ║
 ║   Port: ${config.PORT.toString().padEnd(29)} ║
-║   API: http://localhost:${config.PORT}/api       ║
+║   Base URL: ${config.BASE_URL.padEnd(29)} ║
+║   API: ${config.BASE_URL}/api               ║
 ╚════════════════════════════════════════╝
       `);
     });
